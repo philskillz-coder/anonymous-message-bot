@@ -1,40 +1,45 @@
-#Importing the needed stuff
 import disnake
 import disnake.ext
 from disnake.ext import commands
 from pathlib import Path
 
-Bot = commands.Bot(
-    command_prefix=disnake.ext.commands.when_mentioned, #So the code doesn't cry about it
-    activity=disnake.Activity(type=disnake.ActivityType.watching, name="made by FQQD.ᴅᴇ") #The Discord status of the bot
+bot = commands.Bot(
+    command_prefix=disnake.ext.commands.when_mentioned,
+    activity=disnake.Activity(type=disnake.ActivityType.watching, name="made by FQQD.ᴅᴇ")  # "watching" status
 )
 
-#Spits out stuff in the console when ready to use
-@Bot.event
+# Spits out stuff in the console when ready to use
+@bot.event
 async def on_ready():
-    print(f'{Bot.user} has connected to Discord!')
+    print(f'{bot.user} has connected to Discord!')
 
-#The "/message" command
-@Bot.slash_command(name="message", description="Post an anonymous message")
-async def add(inter, message):
-    await inter.channel.send(message) #Sends the actual message
-    #Making a beautiful embed for the response
-    responseembed = disnake.Embed(
-        title = f"Your message was sent:",
-        description = f"'{message}'",
-        colour = disnake.Colour.yellow(), #OHHH make it yellow
+# The "/message" command
+@bot.slash_command(name="message", description="Post an anonymous message")
+async def add(interaction: disnake.Interaction, message: str):
+    await interaction.channel.send(message)
+
+    creator = await bot.get_user(856509084563275786)  # look in cache before making api request
+    if creator is None:
+        creator = await bot.fetch_user(856509084563275786)
+    
+    # response embed
+    embed = disnake.Embed(
+        title=f"Your message was sent:",
+        description=f"'{message}'",
+        colour=disnake.Colour.yellow(),
     )
-    creator = await Bot.fetch_user(856509084563275786) #Get stuff from my discord profile so the stuff is accurate even if i change someting
-    responseembed.set_footer(
-        text=f"Hey! This bot was made by {creator.name}#{creator.discriminator}", icon_url='{}'.format(creator.avatar) #Little bit of self advertising yk
+    
+    embed.set_footer(
+        text=f"Hey! This bot was made by {creator}", icon_url=creator.display_avatar #Little bit of self advertising yk
     )
-    await inter.response.send_message(embed=responseembed, ephemeral=True) #Send the response embed, but only the author can see
+
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
-#Get the token from a file named "token.txt"
+# Get the token from a file named "token.txt"
 tokenfile = Path(__file__).with_name('token.txt')
 with open(tokenfile, 'r') as token:
     TOKEN = token.read()
 
-#Runs the bot
-Bot.run(TOKEN)
+# Runs the bot
+bot.run(TOKEN)
