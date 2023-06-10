@@ -21,14 +21,14 @@ async def add(interaction: disnake.Interaction, message: str):
     creator = await bot.get_user(856509084563275786)  # look in cache before making api request
     if creator is None:
         creator = await bot.fetch_user(856509084563275786)
-    
+
     # response embed
     embed = disnake.Embed(
-        title=f"Your message was sent:",
+        title="Your message was sent:",
         description=f"'{message}'",
         colour=disnake.Colour.yellow(),
     )
-    
+
     embed.set_footer(
         text=f"Hey! This bot was made by {creator}", icon_url=creator.display_avatar #Little bit of self advertising yk
     )
